@@ -2,12 +2,12 @@
   "name": "pips_resources_blog-posts",
   "version": "1.0.0",
   "description": "the automation behind my personal blogging service",
-  "main": "./dist/update-blog.js",
+  "main": "./dist/get-blog.js",
   "scripts": {
-    "build": "tsc",
+    "delete-post": "ts-node ./src/delete-post.ts",
+    "get-blog": "ts-node ./src/get-blog.ts",
     "test": "jest",
-    "update-blog": "npm run build && node ./dist/update-blog.js",
-    "update-blog-dev": "ts-node ./src/update-blog.ts"
+    "update-blog": "ts-node ./src/update-blog.ts"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^6.9.0",
+    "dotenv": "^16.0.3",
     "gray-matter": "^4.0.3"
   }
 }

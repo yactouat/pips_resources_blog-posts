@@ -5,7 +5,7 @@
 - [pips_resources_blog-posts](#pips_resources_blog-posts)
   - [what is this ?](#what-is-this-)
   - [pre requisites](#pre-requisites)
-  - [good to know](#good-to-know)
+  - [how to use](#how-to-use)
   - [Contribution guidelines](#contribution-guidelines)
   - [Contributors](#contributors)
 
@@ -15,15 +15,21 @@
 
 the automation behind my personal blogging service, this works as follows:
 
-- I write markdown blog posts in either `draft-posts` or `published-posts` folders
-- I run `npm run update-blog` to
-  - CRUD the blog posts Markdown files in a dedicated private GCP storage bucket
-  - CRUD the blog posts associated images in a dedicated GCP storage bucket
+- I get all my blog posts from a GCP storage bucket with `npm run get-blog`, this populates the `./blog` folder
+- I write markdown blog posts in either `./blog/draft-posts` or `./blog/published-posts` folders
+- I can run `npm run update-blog` to
+  - create, read, and update the blog posts Markdown files in a dedicated private GCP storage bucket
+  - create, read, and update the blog posts associated images in a dedicated GCP storage bucket
     - if the image is associated to a published post, it will be accessible via `cdn.yactouat.com`, which points a public GCP storage bucket
-    - if the image is associated to a draft post, it will be sent to a private GCP storage bucket
+    - if the image is associated to a draft post, it will be sent to a private GCP storage bucket dedicated to images
   - trigger my NextJS app to rebuild and redeploy (as I've chosen static site generation for faster loading times and better SEO)
+- I can run `npm run delete-blog-post SLUG` (where `SLUG` is the slug of the blog post) to delete a blog post from the local file system as well as from the GCP bucket, whether it's a draft or a published one
 
 I use `gray-matter` to give metadata to my blog posts
+
+You can install the dependencies with `npm install`
+
+You can test the code with `npm run test`
 
 ## pre requisites
 
@@ -32,13 +38,13 @@ I use `gray-matter` to give metadata to my blog posts
 - a Google Cloud Platform (GCP) project
 - have your Google default application credentials set up on your machine
 - you must have the `gcloud` CLI installed and configured to your GCP project (`gcloud init` if it's not the case)
-- a cloud storage bucket
+- it's nice to have a domain name for your blog
+- you will need 2 GCP storage buckets
+  - a private one for the blog posts
+  - a public one for the images
+    - you can a CDN to this bucket for your images, if you want to
 - a NextJS app that uses the blog posts from the cloud storage bucket, either directly or via a CDN or an external API etc.
-
-## good to know
-
-- you can build the code with `npm run build`
-- you can test the code with `npm run test`
+- you must create a `.env` file based on the `.env.example` file
 
 ## Contribution guidelines
 
