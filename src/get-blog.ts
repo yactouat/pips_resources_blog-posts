@@ -49,7 +49,7 @@ const getBlog = async () => {
     "drafts/images"
   );
   // TODO list blog posts from the GCP storage bucket in an array and make a distinction between draft and published posts (create `drafts` and `published` folders in the GCP bucket if they don't exist)
-  // TODO if posts, populate the local filesystem in the correct directories with the blog posts from the GCP bucket unless they already exist locally and the local copy is more recent than the GCP one
+  // TODO if posts, populate the local filesystem in the correct directories with the blog posts from the GCP bucket unless they already exist locally and the local copy is more recent than the GCP one (use post metadata for this)
 };
 
 getBlog();
