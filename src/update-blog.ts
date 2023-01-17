@@ -9,7 +9,7 @@ const updateBlog = async () => {
   // TODO create each blog post from the array of blog posts to create in the right directory on the GCP bucket + verify that the blog posts were created
   // TODO update each blog post from the array of blog posts to update in the right directory on the GCP bucket + verify that the blog posts were updated
   // TODO change api.yactouat.com so that it only fetches blog posts from the `published` folder of the GCP bucket
-  // TODO trigger a new build of the NextJS website
+  // TODO trigger a new build of the NextJS website by sending a request to api.yactouat.com
 };
 
 updateBlog();

@@ -5,7 +5,6 @@
 - [pips_resources_blog-posts](#pips_resources_blog-posts)
   - [what is this ?](#what-is-this-)
   - [pre requisites](#pre-requisites)
-  - [how to use](#how-to-use)
   - [Contribution guidelines](#contribution-guidelines)
   - [Contributors](#contributors)
 
@@ -27,10 +26,6 @@ the automation behind my personal blogging service, this works as follows:
 
 I use `gray-matter` to give metadata to my blog posts
 
-You can install the dependencies with `npm install`
-
-You can test the code with `npm run test`
-
 ## pre requisites
 
 - [Node.js](https://nodejs.org/en/)
@@ -45,6 +40,7 @@ You can test the code with `npm run test`
     - you can a CDN to this bucket for your images, if you want to
 - a NextJS app that uses the blog posts from the cloud storage bucket, either directly or via a CDN or an external API etc.
 - you must create a `.env` file based on the `.env.example` file
+- you can install the dependencies with `npm install`
 
 ## Contribution guidelines
 
