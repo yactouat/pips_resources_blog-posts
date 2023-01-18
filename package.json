@@ -2,12 +2,12 @@
   "name": "pips_resources_blog-posts",
   "version": "1.0.0",
   "description": "the automation behind my personal blogging service",
-  "main": "./dist/get-blog.js",
+  "main": "./dist/scripts/get-blog.js",
   "scripts": {
-    "delete-post": "ts-node ./src/delete-post.ts",
-    "get-blog": "ts-node ./src/get-blog.ts",
+    "delete-post": "ts-node ./src/scripts/delete-post.ts",
+    "get-blog": "ts-node ./src/scripts/get-blog.ts",
     "test": "jest",
-    "update-blog": "ts-node ./src/update-blog.ts"
+    "update-blog": "ts-node ./src/scripts/update-blog.ts"
   },
   "repository": {
     "type": "git",

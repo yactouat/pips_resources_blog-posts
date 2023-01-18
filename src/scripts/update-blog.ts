@@ -2,10 +2,10 @@ import * as dotenv from "dotenv";
 import fs from "fs";
 import { Storage } from "@google-cloud/storage";
 
-import {
-  downloadBlogPostsAndPopulateLocalFileSystem,
-  downloadImagesAndPopulateLocalFileSystem,
-} from "./get-blog";
+import downloadImages from "../gcp/download-images";
+import downloadPosts from "../gcp/download-posts";
+import getGcpPostContents from "../gcp/get-gcp-post-contents";
+import postIsMoreRecent from "../meta/post-is-more-recent";
 
 const getFileNameAfterLastSlash = (filePath: string): string => {
   return filePath.split("/").pop() ?? "";
@@ -24,7 +24,7 @@ const isImage = (fileName: string): boolean => {
 const sendNewImagesToGCPBucket = async (
   localImagesFolder: string,
   storage: Storage,
-  gcpImagesBucketName: string,
+  gcpBucket: string,
   gcpImagesFolder: string
 ): Promise<void> => {
   // list blog images present in the local filesystem
@@ -33,9 +33,9 @@ const sendNewImagesToGCPBucket = async (
     .filter((fileName) => isImage(fileName))
     .map((fileName) => `${localImagesFolder}/${fileName}`);
   // list images present in GCP bucket relevant images folder
-  const gcpBucketImages = await downloadImagesAndPopulateLocalFileSystem(
+  const gcpBucketImages = await downloadImages(
     storage,
-    gcpImagesBucketName,
+    gcpBucket,
     localImagesFolder,
     gcpImagesFolder
   );
@@ -48,7 +48,7 @@ const sendNewImagesToGCPBucket = async (
         .includes(imageName)
     ) {
       await storage
-        .bucket(gcpImagesBucketName)
+        .bucket(gcpBucket)
         .upload(`${localImagesFolder}/${imageName}`, {
           destination: `${gcpImagesFolder}/${imageName}`,
         });
@@ -60,32 +60,56 @@ const updateBlog = async () => {
   console.log("Updating blog...");
   dotenv.config();
   const storage = new Storage();
-  const postsGCPBucketName = process.env
-    .PRIVATE_BLOG_POSTS_GCP_STORAGE_BUCKET_NAME as string;
+  const gcpBucket = process.env.POSTS_GCP_BUCKET as string;
   // populate the local filesystem with the latest blog posts and images from the GCP bucket
-  const gcpBlogPosts = await downloadBlogPostsAndPopulateLocalFileSystem(
-    storage,
-    postsGCPBucketName
-  );
+  const gcpPosts = await downloadPosts(storage, gcpBucket);
   // send new images (private and public) to the relevant GCP bucket
   await sendNewImagesToGCPBucket(
     "blog/published/images",
     storage,
-    process.env.PUBLIC_IMAGES_GCP_STORAGE_BUCKET_NAME as string,
-    process.env.PUBLIC_IMAGES_GCP_STORAGE_BUCKET_NAME_BLOG_PREFIX ?? "/"
+    process.env.IMAGES_GCP_BUCKET as string,
+    process.env.IMAGES_GCP_BUCKET_PREFIX ?? "/"
   );
   await sendNewImagesToGCPBucket(
     "blog/drafts/images",
     storage,
-    postsGCPBucketName,
+    gcpBucket,
     "drafts/images"
   );
+  // compare list of blog posts from the GCP with the list of blog posts from the local filesystem
+  const localPublishedPosts = fs
+    .readdirSync("blog/published")
+    .map((fileName) => `published/${fileName}`)
+    .filter((fileName) => fileName.toLowerCase().endsWith(".md"));
+  const localDraftPosts = fs
+    .readdirSync("blog/drafts")
+    .map((fileName) => `drafts/${fileName}`)
+    .filter((fileName) => fileName.toLowerCase().endsWith(".md"));
+  const localPosts = [...localPublishedPosts, ...localDraftPosts];
+  for (let i = 0; i < localPosts.length; i++) {
+    const localPostName = localPosts[i];
+    let canWriteLocalPostToGCPBucket = false;
+    if (!gcpPosts.includes(localPostName)) {
+      canWriteLocalPostToGCPBucket = true;
+    } else {
+      const gcpBucketPostName = gcpPosts.find((name) => name === localPostName);
+      const gcpBucketPostContents = await getGcpPostContents(
+        gcpBucketPostName as string,
+        gcpBucket,
+        storage
+      );
+      canWriteLocalPostToGCPBucket = postIsMoreRecent(
+        fs.readFileSync(`blog/${localPostName}`, "utf8"),
+        gcpBucketPostContents
+      );
+    }
+    if (canWriteLocalPostToGCPBucket) {
+      await storage.bucket(gcpBucket).upload(`blog/${localPostName}`, {
+        destination: localPostName,
+      });
+    }
+  }
 
-  // TODO create each image from the array of images to create in the right directory on the right GCP bucket (wheter associated with published or draft post) + verify that the images were created
-  // TODO add local blog posts to an array of blog posts to create if they are not already in the fetched blog array
-  // TODO add local blog posts to an array of blog posts to update if their date differs from the GCP bucket copy for the same file and is more recent than the latter
-  // TODO create each blog post from the array of blog posts to create in the right directory on the GCP bucket + verify that the blog posts were created
-  // TODO update each blog post from the array of blog posts to update in the right directory on the GCP bucket + verify that the blog posts were updated
   // TODO change api.yactouat.com so that it only fetches blog posts from the `published` folder of the GCP bucket
   // TODO trigger a new build of the NextJS website by sending a request to api.yactouat.com
 
