@@ -7,6 +7,55 @@ import {
   downloadImagesAndPopulateLocalFileSystem,
 } from "./get-blog";
 
+const getFileNameAfterLastSlash = (filePath: string): string => {
+  return filePath.split("/").pop() ?? "";
+};
+
+const isImage = (fileName: string): boolean => {
+  return (
+    fileName.toLowerCase().endsWith(".gif") ||
+    fileName.toLowerCase().endsWith(".jpg") ||
+    fileName.toLowerCase().endsWith(".jpeg") ||
+    fileName.toLowerCase().endsWith(".png") ||
+    fileName.toLowerCase().endsWith(".webp")
+  );
+};
+
+const sendNewImagesToGCPBucket = async (
+  localImagesFolder: string,
+  storage: Storage,
+  gcpImagesBucketName: string,
+  gcpImagesFolder: string
+): Promise<void> => {
+  // list blog images present in the local filesystem
+  const localImages = fs
+    .readdirSync(localImagesFolder)
+    .filter((fileName) => isImage(fileName))
+    .map((fileName) => `${localImagesFolder}/${fileName}`);
+  // list images present in GCP bucket relevant images folder
+  const gcpBucketImages = await downloadImagesAndPopulateLocalFileSystem(
+    storage,
+    gcpImagesBucketName,
+    localImagesFolder,
+    gcpImagesFolder
+  );
+  // send all new images to the relevant GCP bucket
+  for (let i = 0; i < localImages.length; i++) {
+    const imageName = getFileNameAfterLastSlash(localImages[i]);
+    if (
+      !gcpBucketImages
+        .map((fileName) => getFileNameAfterLastSlash(fileName))
+        .includes(imageName)
+    ) {
+      await storage
+        .bucket(gcpImagesBucketName)
+        .upload(`${localImagesFolder}/${imageName}`, {
+          destination: `${gcpImagesFolder}/${imageName}`,
+        });
+    }
+  }
+};
+
 const updateBlog = async () => {
   console.log("Updating blog...");
   dotenv.config();
@@ -18,48 +67,20 @@ const updateBlog = async () => {
     storage,
     postsGCPBucketName
   );
-  // list blog public images present in the local filesystem
-  const localPublicBlogImages = fs
-    .readdirSync("blog/published/images")
-    .filter((fileName) => {
-      return (
-        fileName.toLowerCase().endsWith(".gif") ||
-        fileName.toLowerCase().endsWith(".jpg") ||
-        fileName.toLowerCase().endsWith(".jpeg") ||
-        fileName.toLowerCase().endsWith(".png") ||
-        fileName.toLowerCase().endsWith(".webp")
-      );
-    });
-  // list images present in the images `blog` folder of the public GCP images bucket
-  const gcpPublicBlogImagesBucketName = process.env
-    .PUBLIC_IMAGES_GCP_STORAGE_BUCKET_NAME as string;
-  const gcpPublicBlogImages = await downloadImagesAndPopulateLocalFileSystem(
-    storage,
-    gcpPublicBlogImagesBucketName,
+  // send new images (private and public) to the relevant GCP bucket
+  await sendNewImagesToGCPBucket(
     "blog/published/images",
+    storage,
+    process.env.PUBLIC_IMAGES_GCP_STORAGE_BUCKET_NAME as string,
     process.env.PUBLIC_IMAGES_GCP_STORAGE_BUCKET_NAME_BLOG_PREFIX ?? "/"
   );
-  // list images present in the `drafts/images` folder of the blog posts private GCP bucket
-  const gcpPrivateBlogImages = await downloadImagesAndPopulateLocalFileSystem(
+  await sendNewImagesToGCPBucket(
+    "blog/drafts/images",
     storage,
     postsGCPBucketName,
-    "blog/drafts/images",
     "drafts/images"
   );
-  // send all new public images to the public images GCP bucket
-  for (let i = 0; i < localPublicBlogImages.length; i++) {
-    const image = localPublicBlogImages[i];
-    console.log(image, gcpPublicBlogImages);
-    if (!gcpPublicBlogImages.includes(`blog/published/images/${image}`)) {
-      await storage
-        .bucket(gcpPublicBlogImagesBucketName)
-        .upload(`blog/published/images/${image}`, {
-          destination: `${process.env.PUBLIC_IMAGES_GCP_STORAGE_BUCKET_NAME_BLOG_PREFIX}/${image}`,
-        });
-    }
-  }
 
-  // TODO add local images to an array of images to create if they dont exist on either the public or private GCP buckets for images (depending on whether they are draft or published blog posts associated images)
   // TODO create each image from the array of images to create in the right directory on the right GCP bucket (wheter associated with published or draft post) + verify that the images were created
   // TODO add local blog posts to an array of blog posts to create if they are not already in the fetched blog array
   // TODO add local blog posts to an array of blog posts to update if their date differs from the GCP bucket copy for the same file and is more recent than the latter

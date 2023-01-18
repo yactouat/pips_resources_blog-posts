@@ -58,35 +58,43 @@ export const downloadBlogPostsAndPopulateLocalFileSystem = async (
   return gcpDownloadedBlogPosts;
 };
 
+/**
+ *
+ * @param {Storage} storage
+ * @param {string} gcpBucketName
+ * @param {string} localDestinationFolder
+ * @param {string} gcpFolderPrefix
+ * @returns a list of the images present in the GCP bucket folder
+ */
 export const downloadImagesAndPopulateLocalFileSystem = async (
   storage: Storage,
-  bucketName: string,
-  destDir: string, // e.g. "blog/published/images"
+  gcpBucketName: string,
+  localDestinationFolder: string, // e.g. "blog/published/images"
   gcpFolderPrefix: string = "/"
 ): Promise<string[]> => {
   const listingOptions = {
     prefix: gcpFolderPrefix,
   };
-  const [images] = await storage.bucket(bucketName).getFiles(listingOptions);
-  const newlyDownloadedImages: string[] = [];
+  const [images] = await storage.bucket(gcpBucketName).getFiles(listingOptions);
+  const gpcBucketImages: string[] = [];
   for (let i = 0; i < images.length; i++) {
     const image = images[i];
     // if any images, populate the local filesystem in the blog's relevant folder with the images from the GCP bucket unless they already exist locally (for now let's not compare images to update them)
     const destFileOptions = {
-      destination: `${destDir}/${image.name.replace(
+      destination: `${localDestinationFolder}/${image.name.replace(
         gcpFolderPrefix + "/",
         ""
       )}`,
     };
-    newlyDownloadedImages.push(destFileOptions.destination);
+    gpcBucketImages.push(image.name);
     if (!fs.existsSync(destFileOptions.destination)) {
       await storage
-        .bucket(bucketName)
+        .bucket(gcpBucketName)
         .file(image.name)
         .download(destFileOptions);
     }
   }
-  return newlyDownloadedImages;
+  return gpcBucketImages;
 };
 
 const extractPostMetadataFromRawPost = (postContents: string): PostMetaData => {
