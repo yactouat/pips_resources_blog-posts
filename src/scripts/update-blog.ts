@@ -109,10 +109,15 @@ const updateBlog = async () => {
       });
     }
   }
-
-  // TODO change api.yactouat.com so that it only fetches blog posts from the `published` folder of the GCP bucket
-  // TODO trigger a new build of the NextJS website by sending a request to api.yactouat.com
-
+  fetch("https://api.yactouat.com/builds", {
+    body: JSON.stringify({
+      vercelToken: process.env.VERCEL_TOKEN,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
   console.log("Blog updated...");
 };
 

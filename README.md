@@ -22,9 +22,22 @@ the automation behind my personal blogging service, this works as follows:
     - if the image is associated to a published post, it will be sent to a public GCP storage bucket dedicated to images
     - if the image is associated to a draft post, it will be sent to the private blog posts GCP storage bucket
   - trigger my NextJS app to rebuild and redeploy (as I've chosen static site generation for faster loading times and better SEO)
-- I can run `npm run delete-blog-post SLUG` (where `SLUG` is the slug of the blog post) to delete a blog post from the local file system as well as from the GCP bucket, whether it's a draft or a published one
 
-I use `gray-matter` to give metadata to my blog posts
+I use `gray-matter` to give metadata to my blog posts, this is how a blog post should be formatted =>
+
+```
+---
+date: "2020-01-01"
+slug: "blog-post"
+title: "blog post"
+---
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut lobortis leo. Phasellus aliquet velit ut sagittis tempor. Aliquam nisl velit, semper eu laoreet at, mollis id enim. Donec auctor accumsan enim vitae placerat. Morbi lacinia arcu nec lacus rhoncus aliquet. Duis imperdiet arcu justo, ac pulvinar elit imperdiet at. Duis id velit nisl.
+```
+
+there is no need to add an h1 title in the markdown file, as the title will be used as the h1 tag on blog site build
+
+! make sure the slug of the blog posts is unique and matches the name of the markdown file
 
 ## pre requisites
 
