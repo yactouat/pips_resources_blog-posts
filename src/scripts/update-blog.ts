@@ -109,7 +109,7 @@ const updateBlog = async () => {
       });
     }
   }
-  fetch("https://api.yactouat.com/builds", {
+  await fetch("https://api.yactouat.com/builds", {
     body: JSON.stringify({
       vercelToken: process.env.VERCEL_TOKEN,
     }),
