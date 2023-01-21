@@ -118,9 +118,7 @@ const updateBlog = async () => {
     },
     method: "POST",
   });
-  console.log(
-    "Blog updated... dont forget to promote your build to production when you're ready!"
-  );
+  console.log("Blog updated...");
 };
 
 updateBlog();
