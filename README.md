@@ -47,10 +47,7 @@ there is no need to add an h1 title in the markdown file, as the title will be u
 - have your Google default application credentials set up on your machine
 - you must have the `gcloud` CLI installed and configured to your GCP project (`gcloud init` if it's not the case)
 - it's nice to have a domain name for your blog
-- you will need 2 GCP storage buckets
-  - a private one for the blog posts
-  - a public one for the images
-    - you can a CDN to this bucket for your images, if you want to
+- you will need 2 private GCP storage buckets, one for the blog posts and one for the blog posts images
 - a NextJS app that uses the blog posts from the cloud storage bucket, either directly or via a CDN or an external API etc.
 - you must create a `.env` file based on the `.env.example` file
 - you can install the dependencies with `npm install`
