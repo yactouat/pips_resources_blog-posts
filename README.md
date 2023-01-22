@@ -35,9 +35,11 @@ title: "blog post"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut lobortis leo. Phasellus aliquet velit ut sagittis tempor. Aliquam nisl velit, semper eu laoreet at, mollis id enim. Donec auctor accumsan enim vitae placerat. Morbi lacinia arcu nec lacus rhoncus aliquet. Duis imperdiet arcu justo, ac pulvinar elit imperdiet at. Duis id velit nisl.
 ```
 
+the date is written in the format `YYYY-MM-DD`
+
 there is no need to add an h1 title in the markdown file, as the title will be used as the h1 tag on blog site build
 
-! make sure the slug of the blog posts is unique and matches the name of the markdown file
+! make sure the slug of the blog posts is unique and matches the name of the markdown file (in the format `the-slug.md`), the slug in the metadata does not contain the file extension; the `slug` prop is used to generate the URL of the blog post
 
 ## pre requisites
 
