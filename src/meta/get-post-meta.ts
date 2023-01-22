@@ -1,8 +1,12 @@
 import matter from "gray-matter";
 
-import { PostMetaData } from "./PostMetaData";
-
-const getPostMeta = (postContents: string): PostMetaData => {
+const getPostMeta = (
+  postContents: string
+): {
+  date: string;
+  slug: string;
+  title: string;
+} => {
   // Use gray-matter to parse the post metadata section
   const meta = matter(postContents);
   if (
