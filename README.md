@@ -18,9 +18,7 @@ the automation behind my personal blogging service, this works as follows:
 - I write markdown blog posts in either `./blog/draft-posts` or `./blog/published-posts` folders
 - I can run `npm run update-blog` to
   - read and create/update the blog posts Markdown files in a dedicated private GCP storage bucket
-  - persist the blog posts associated images in a dedicated GCP storage bucket
-    - if the image is associated to a published post, it will be sent to a public GCP storage bucket dedicated to images
-    - if the image is associated to a draft post, it will be sent to the private blog posts GCP storage bucket
+  - persist the blog posts associated images in a dedicated private GCP storage bucket
   - trigger my NextJS app to rebuild and redeploy (as I've chosen static site generation for faster loading times and better SEO)
 
 I use `gray-matter` to give metadata to my blog posts, this is how a blog post should be formatted =>

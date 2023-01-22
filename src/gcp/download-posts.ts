@@ -6,11 +6,11 @@ import postIsMoreRecent from "../meta/post-is-more-recent";
 
 const downloadPosts = async (
   storage: Storage,
-  gcpBucket: string
+  gcpBucketName: string
 ): Promise<string[]> => {
   const gcpPostsList: string[] = [];
   // getting blog posts from the GCP storage bucket
-  const [gcpBucketPosts] = await storage.bucket(gcpBucket).getFiles();
+  const [gcpBucketPosts] = await storage.bucket(gcpBucketName).getFiles();
   // iterate over Markdown posts
   for (let i = 0; i < gcpBucketPosts.length; i++) {
     if (gcpBucketPosts[i].name.toLowerCase().endsWith(".md")) {
@@ -21,7 +21,7 @@ const downloadPosts = async (
       let canWriteLocally = true;
       const gcpBucketPostContents = await getGcpPostContents(
         gcpBucketPost.name,
-        gcpBucket,
+        gcpBucketName,
         storage
       );
       try {
