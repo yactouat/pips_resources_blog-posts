@@ -5,7 +5,7 @@ import downloadImages from "../gcp/download-images";
 import downloadPosts from "../gcp/download-posts";
 
 const getBlog = async () => {
-  console.log("Getting blog data ...");
+  console.log("Getting blog contents ...");
   dotenv.config();
   const storage = new Storage();
   const gcpBucket = process.env.BLOGPOSTS_GCP_BUCKET as string;
@@ -25,7 +25,7 @@ const getBlog = async () => {
   );
   // populate local filesystem with the blog posts from the GCP bucket
   await downloadPosts(storage, gcpBucket);
-  console.log("Got blog data ...");
+  console.log("Got blog contents ...");
 };
 
 // calling `getBlog` on `npm run get-blog`

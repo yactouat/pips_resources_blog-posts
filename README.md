@@ -19,7 +19,7 @@ the automation behind my personal blogging service, this works as follows:
 - I can run `npm run update-blog` to
   - read and create/update the blog posts Markdown files in a dedicated private GCP storage bucket
   - persist the blog posts associated images in a dedicated private GCP storage bucket
-  - trigger my NextJS app to rebuild and redeploy (as I've chosen static site generation for faster loading times and better SEO)
+  - trigger a Pub/Sub notification that will broadcast a blog updated event accross my PIPS system
 
 I use `gray-matter` to give metadata to my blog posts, this is how a blog post should be formatted =>
 

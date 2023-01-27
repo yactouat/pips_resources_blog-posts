@@ -35,7 +35,6 @@
   "dependencies": {
     "@google-cloud/storage": "^6.9.0",
     "dotenv": "^16.0.3",
-    "gray-matter": "^4.0.3",
-    "node-fetch": "^2.6.8"
+    "gray-matter": "^4.0.3"
   }
 }

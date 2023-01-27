@@ -57,12 +57,12 @@ const sendNewImagesToGCPBucket = async (
 };
 
 const updateBlog = async () => {
-  console.log("Updating blog...");
+  console.log("Updating blog contents...");
   dotenv.config();
   const storage = new Storage();
-  const gcpBucket = process.env.BLOGPOSTS_GCP_BUCKET as string;
+  const postsGcpBucket = process.env.BLOGPOSTS_GCP_BUCKET as string;
   // populate the local filesystem with the latest blog posts and images from the GCP bucket
-  const gcpPosts = await downloadPosts(storage, gcpBucket);
+  const gcpPosts = await downloadPosts(storage, postsGcpBucket);
   // send new images (private and public) to the relevant GCP bucket
   await sendNewImagesToGCPBucket(
     "blog/published/images",
@@ -73,7 +73,7 @@ const updateBlog = async () => {
   await sendNewImagesToGCPBucket(
     "blog/drafts/images",
     storage,
-    gcpBucket,
+    postsGcpBucket,
     "private/blog"
   );
   // compare list of blog posts from the GCP with the list of blog posts from the local filesystem
@@ -95,7 +95,7 @@ const updateBlog = async () => {
       const gcpBucketPostName = gcpPosts.find((name) => name === localPostName);
       const gcpBucketPostContents = await getGcpPostContents(
         gcpBucketPostName as string,
-        gcpBucket,
+        postsGcpBucket,
         storage
       );
       canWriteLocalPostToGCPBucket = postIsMoreRecent(
@@ -104,21 +104,12 @@ const updateBlog = async () => {
       );
     }
     if (canWriteLocalPostToGCPBucket) {
-      await storage.bucket(gcpBucket).upload(`blog/${localPostName}`, {
+      await storage.bucket(postsGcpBucket).upload(`blog/${localPostName}`, {
         destination: localPostName,
       });
     }
   }
-  await fetch("https://api.yactouat.com/builds", {
-    body: JSON.stringify({
-      vercelToken: process.env.VERCEL_TOKEN,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-  });
-  console.log("Blog updated...");
+  console.log("Blog contents updated...");
 };
 
 updateBlog();
