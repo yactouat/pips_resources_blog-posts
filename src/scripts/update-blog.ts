@@ -60,14 +60,14 @@ const updateBlog = async () => {
   console.log("Updating blog contents...");
   dotenv.config();
   const storage = new Storage();
-  const postsGcpBucket = process.env.BLOGPOSTS_GCP_BUCKET as string;
+  const postsGcpBucket = process.env.BLOGPOSTS_BUCKET as string;
   // populate the local filesystem with the latest blog posts and images from the GCP bucket
   const gcpPosts = await downloadPosts(storage, postsGcpBucket);
   // send new images (private and public) to the relevant GCP bucket
   await sendNewImagesToGCPBucket(
     "blog/published/images",
     storage,
-    process.env.IMAGES_GCP_BUCKET as string,
+    process.env.IMAGES_BUCKET as string,
     "public/blog"
   );
   await sendNewImagesToGCPBucket(

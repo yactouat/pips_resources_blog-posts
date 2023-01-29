@@ -8,11 +8,11 @@ const getBlog = async () => {
   console.log("Getting blog contents ...");
   dotenv.config();
   const storage = new Storage();
-  const gcpBucket = process.env.BLOGPOSTS_GCP_BUCKET as string;
+  const gcpBucket = process.env.BLOGPOSTS_BUCKET as string;
   // list images present in the `public` folder of the GCP images bucket and populate local filesystem with them under `blog/published/images`
   await downloadImages(
     storage,
-    process.env.IMAGES_GCP_BUCKET as string,
+    process.env.IMAGES_BUCKET as string,
     "blog/published/images",
     "public/blog"
   );
