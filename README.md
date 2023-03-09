@@ -12,14 +12,14 @@
 
 ## what is this ?
 
-the automation behind my personal blogging service, this works as follows:
+the automation behind my PIPS (Portable Integrated Personal System) blogging service, this is from here that I persist blog posts in the cloud, this works as follows:
 
 - I get all my blog posts from a GCP storage bucket with `npm run get-blog`, this populates the `./blog` folder
-- I write markdown blog posts in either `./blog/draft-posts` or `./blog/published-posts` folders
+- I write markdown blog posts in either `./blog/draft` or `./blog/published` folders
 - I can run `npm run update-blog` to
-  - read and create/update the blog posts Markdown files in a dedicated private GCP storage bucket
-  - persist the blog posts associated images in a dedicated private GCP storage bucket
-  - trigger a Pub/Sub notification that will broadcast a blog updated event accross my PIPS system
+  - read and create/update the blog posts Markdown files back in their bucket
+  - persist the blog posts associated images in another GCP storage bucket
+  - trigger a Pub/Sub notification that will broadcast a blog updated event across my PIPS system for services that may use my blog posts
 
 I use `gray-matter` to give metadata to my blog posts, this is how a blog post should be formatted =>
 
@@ -39,21 +39,25 @@ there is no need to add an h1 title in the markdown file, as the title will be u
 
 ! make sure the slug of the blog posts is unique and matches the name of the markdown file (in the format `the-slug.md`), the slug in the metadata does not contain the file extension; the `slug` prop is used to generate the URL of the blog post
 
+at the moment, the blog posts deletion feature that you may encounter in the `package.json` scripts is not implemented
+
 ## pre requisites
 
 - [Node.js](https://nodejs.org/en/)
 - [Typescript](https://www.typescriptlang.org/)
 - a Google Cloud Platform (GCP) project
-- have your Google default application credentials set up on your machine, as this is meant to be used by a human GCP user, not a service account
+- have your Google default application credentials set up on your machine, as this is application is meant to be used by a human GCP user, not a service account
 - you must have the `gcloud` CLI installed and configured to your GCP project (`gcloud init` if it's not the case)
-- it's nice to have a domain name for your blog
 - you will need 2 GCP storage buckets, one private bucket for the blog posts and one public for the blog posts images
 - you must create a `.env` file based on the `.env.example` file
 - you can install the dependencies with `npm install`
+- you can run tests with `npm run test`
 
 ## Contribution guidelines
 
-dear past, present, and future contributors, you have my many thanks, but please follow these guidelines:
+feel free to use this project as a base for your own projects, but please follow these guidelines:
+
+dear past, present, and future contributors, you have my many thanks, but:
 
 - please use comments to explain your code, even if it's obvious to you, it might not be to someone else
 - you are free to arrange the code, the folder structure, the file names, etc. as you see fit if you're able to provide a good reason for it
